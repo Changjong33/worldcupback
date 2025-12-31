@@ -20,23 +20,23 @@ export class Player {
   @Column({ nullable: true })
   number: number;
 
-  @Column({ length: 3 })
-  countryTla: string;
+  @Column({ name: 'country_tla', length: 3, nullable: true })
+  countryTla?: string;
 
-  @Column({ length: 100, nullable: true })
+  @Column({ name: 'team_id', nullable: true })
+  teamId?: number;
+
+  @Column({ name: 'club_name' })
   clubName: string;
 
   @Column({ nullable: true })
   age: number;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ name: 'photo_url' })
   photoUrl: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'emblem_url' })
   emblemUrl: string;
-
-  @Column({ nullable: true })
-  debutYear: number;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

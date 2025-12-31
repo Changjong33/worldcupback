@@ -27,9 +27,9 @@ export class WorldCupController {
     return this.service.getStandings();
   }
 
-  @Get('teams/:id/squad')
-  getSquad(@Param('id', ParseIntPipe) id: number) {
-    return this.service.getTeamSquad(id);
+  @Get('teams/:id/players')
+  getTeamPlayers(@Param('id', ParseIntPipe) id: number) {
+    return this.service.getTeamPlayers(id);
   }
 
   @Get('info')

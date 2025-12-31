@@ -12,7 +12,7 @@ export class WorldCupService {
 
   constructor(
     @InjectRepository(Player)
-    private playerRepository: Repository<Player>,
+    private readonly playerRepository: Repository<Player>,
     private readonly footballApi: FootballApiService,
   ) {}
 
@@ -24,9 +24,42 @@ export class WorldCupService {
     return this.footballApi.getStandings(this.worldCupId);
   }
 
-  async getTeamSquad(teamId: number) {
+  async getTeamPlayers(teamId: number) {
+    // 1️⃣ 외부 API에서 팀 정보
     const team = await this.footballApi.getTeam(teamId);
-    return WorldCupMapper.mapTeamSquad(team);
+
+    if (!team) {
+      throw new Error('팀 정보를 찾을 수 없습니다.');
+    }
+
+    // 2️⃣ DB에서 선수단 조회 (tla 우선, 없으면 teamId)
+    const players = team.tla
+      ? await this.playerRepository.find({
+          where: { countryTla: team.tla },
+          order: { number: 'ASC' },
+        })
+      : await this.playerRepository.find({
+          where: { teamId: team.id },
+          order: { number: 'ASC' },
+        });
+
+    // 3️⃣ 포지션별 분류
+    const squad = {
+      Goalkeeper: players.filter((p) => p.position === 'GK'),
+      Defender: players.filter((p) => p.position === 'DF'),
+      Midfielder: players.filter((p) => p.position === 'MF'),
+      Attacker: players.filter((p) => p.position === 'FW'),
+    };
+
+    // 4️⃣ 최종 응답
+    return {
+      id: team.id,
+      name: team.name,
+      tla: team.tla ?? null, // Curaçao 대응
+      crest: team.crest,
+      squad,
+      players, // 전체 리스트
+    };
   }
 
   async getWorldCupInfo() {
