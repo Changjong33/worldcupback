@@ -5,16 +5,16 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // CORS 활성화
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
-  await app.listen(process.env.PORT ?? 3000);
-  console.log(
-    `서버가 http://localhost:${process.env.PORT ?? 3000}에서 실행 중입니다.`,
-  );
-  console.log(
-    `API 엔드포인트: http://localhost:${process.env.PORT ?? 3000}/api/matches`,
-  );
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
+
+  const baseUrl = process.env.RAILWAY_PUBLIC_DOMAIN
+    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+    : `http://localhost:${port}`;
+
+  console.log(`서버 실행 중: ${baseUrl}`);
 }
 bootstrap();
